@@ -1,11 +1,11 @@
 %%%%% PC-corr algorithm associate to PCA analysis%%%%%
 
 %%% Released under MIT License
-%%% Copyright (c) 2017 Sara Ciucci, Yan Ge, Claudio Dur·n and Carlo Vittorio Cannistraci
+%%% Copyright (c) 2017 Sara Ciucci, Yan Ge, Claudio Dur√°n and Carlo Vittorio Cannistraci
 
 % Please cite:
 % Enlightening discriminative network functional modules behind Principal Component Analysis separation in differential-omic science studies.
-% Sara Ciucci, Yan Ge, Claudio Dur·n, Alessandra Palladini, VÌctor JimÈnez JimÈnez, Luisa MarÌa MartÌnez S·nchez, 
+% Sara Ciucci, Yan Ge, Claudio Dur√°n, Alessandra Palladini, V√≠ctor Jim√©nez Jim√©nez, Luisa Mar√≠a Mart√≠nez S√°nchez, 
 % Yuting Wang, Susanne Sales, Andrej Shevchenko, Steven W. Poser, Maik Herbig, Oliver Otto, Andreas Androutsellis-Theotokis, 
 % Jochen Guck, Mathias J. Gerl and Carlo Vittorio Cannistraci 
 % Scientific Reports, 2017
@@ -2039,7 +2039,7 @@ end
 
 
 if nargin < 2
-    sheetName = 'Sheet'; % EN: Sheet, DE: Tabelle, HE: ‚ÈÏÈÂÔ , etc. (Lang. dependent)
+    sheetName = 'Sheet'; % EN: Sheet, DE: Tabelle, HE: √¢√©√¨√©√•√Ø , etc. (Lang. dependent)
 else
     if ~ischar(sheetName)
         error('Default sheet name must be a string.');
