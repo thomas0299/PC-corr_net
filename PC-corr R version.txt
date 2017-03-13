@@ -1,0 +1,4 @@
+############## IMPORTANT: R version ##############
+
+Dear users,
+the R version will be released on Friday 24 March.
