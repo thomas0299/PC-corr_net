@@ -216,7 +216,7 @@ for i = 1:length(norm)
     end
 end
 if flag==1
- warning('Since some AUC-ROC were < 0.5, we inverted their labels and now they are >=0.5');
+ warning('Since some AUC-ROC were < 0.5, we inverted their labels and now AUC-ROC are >=0.5');
 end
 
 %% Constructing the table of results
