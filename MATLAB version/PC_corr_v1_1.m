@@ -129,7 +129,7 @@ elseif strcmp(u_lab,'con')
     labl_numb = cell2mat(labels);
 end
 
-
+flag=0;
 for i = 1:length(norm)
     
     %%% non-centred PCA
@@ -170,8 +170,8 @@ for i = 1:length(norm)
                 [~,~,~,AUC_c{i,j,k}] = perfcurve(samp_lab,scores_c,nameLabels{n});
                 
                 if AUC_nc{i,j,k}<0.5
+                    flag = 1;
                     AUC_nc{i,j,k} = 1-AUC_nc{i,j,k};
-                    warning('Since AUC-ROC was < 0.5, we inverted the labels and now it is >=0.5');
                     % Compute AUPR
                     [~,~,~,AUPR_nc{i,j,k}] = perfcurve(samp_lab,scores_nc,nameLabels{m},'xCrit','reca','yCrit','prec');
                 else
@@ -180,8 +180,8 @@ for i = 1:length(norm)
                 end 
                 
                 if AUC_c{i,j,k}<0.5
+                    flag = 1;
                     AUC_c{i,j,k} = 1-AUC_c{i,j,k};
-                    warning('Since AUC-ROC was < 0.5, we inverted the labels and now it is >=0.5');
                     % Compute AUPR
                     [~,~,~,AUPR_c{i,j,k}] = perfcurve(samp_lab,scores_c,nameLabels{m},'xCrit','reca','yCrit','prec');
                 else
@@ -214,6 +214,9 @@ for i = 1:length(norm)
             
         end
     end
+end
+if flag==1
+ warning('Since some AUC-ROC were < 0.5, we inverted their labels and now they are >=0.5');
 end
 
 %% Constructing the table of results
