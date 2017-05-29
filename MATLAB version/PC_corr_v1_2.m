@@ -41,7 +41,7 @@
 %           (that is a cell array with the same structure as in the single cut-off case)
 
 
-function [Edges,Nodes]=PC_corr(x,sample_labels,feat_names, sample_names,dis)
+function [Edges,Nodes]=PC_corr_v1_2_19_5_2017(x,sample_labels,feat_names, sample_names,dis)
 
 %% initialisation and default options
 if nargin<4, error('Not Enough Input Arguments'); end
@@ -1096,7 +1096,7 @@ col{I(1)}='k';
 col{I(numbLabels)}='r';
 if numbLabels>2
     for i=2:numbLabels-1
-        col{I(i)}=rand(1,3);
+        col{I(i)}=0.05 + rand(1,3)*(0.95-0.05); %creating a vector of three random numbers in between 0.05 and 0.95
     end
 end
 
@@ -1787,22 +1787,22 @@ t3=sum(m1'.*b')/sum(b==1);
 t4=sum(m2'.*(~b)')/sum(b==0);
 
 
-if (l1==0)&&(t2>t3)
+if (l1==0)&&(t2>=t3)
     t=t2;
     NodeColor(b==1)={'Black'};
     n1_f=NaN;
     n2_f=1-t;
-elseif (l1==0)&&(t3>t2)
+elseif (l1==0)&&(t3>=t2)
     t=t3;
     NodeColor(b==1)={'Red'};
     n1_f=NaN;
     n2_f=1-t;
-elseif (l2==0)&&(t1>t4)
+elseif (l2==0)&&(t1>=t4)
     t=t1;
     NodeColor(b==0)={'Red'};
     n1_f=1-t;
     n2_f=NaN;
-elseif  (l2==0)&&(t4>t1)
+elseif  (l2==0)&&(t4>=t1)
     t=t4;
     NodeColor(b==0)={'Black'};
     n1_f=1-t;
@@ -1898,13 +1898,13 @@ for i=1:length(g.nodes)-1
             n=strcmp(nodes1{i+1,2},'Red');
             m=strcmp(nodes1{j+1,2},'Red');
             if (n*m==1)&&(sign(eh1.Weight)==-1)
-                eh1.LineColor=[0.6 0.6 0.6];
+                eh1.LineColor=[0.9 0.9 0.9];
                 edg_frust=edg_frust+1;
             elseif (n+m==0)&&(sign(eh1.Weight)==-1)
-                eh1.LineColor=[0.6 0.6 0.6];
+                eh1.LineColor=[0.9 0.9 0.9];
                 edg_frust=edg_frust+1;
             elseif (n+m==1)&& (sign(eh1.Weight)==1)
-                eh1.LineColor=[0.6 0.6 0.6];
+                eh1.LineColor=[0.9 0.9 0.9];
                 edg_frust=edg_frust+1;
             end
         end
@@ -1919,7 +1919,7 @@ for i=1:length(g.edges)
     else
          val_red=[val_red];
     end
-    if g.edges(i).LineColor(1)==0
+    if (g.edges(i).LineColor(1)~=1) && (g.edges(i).LineColor(1)~=0.9)
         val_black=[val_black g.edges(i).LineColor(1)];
     else
         val_black=[val_black];
@@ -1942,20 +1942,19 @@ close(bg.hgFigure);
 %Replace the grey edges (edges under frustration) in the figure with dashed grey edges 
 fr_edg_frust=edg_frust/length(g.edges);
 axesHandle = gca;
-plotHandle = findobj(axesHandle,'Type','line','Color',[.6 .6 .6]);
 plotHandle1 = findobj(axesHandle,'Type','line','Color',[1 0 0]);
 if isempty(plotHandle1)
     plotHandle1=findobj(axesHandle,'Type','line','Color',[1 min_red min_red]);
 end
-
 plotHandle2 = findobj(axesHandle,'Type','line','Color','k','LineWidth',0.5);
 if isempty(plotHandle2)
     plotHandle2=findobj(axesHandle,'Type','line','Color',[min_black min_black min_black]);
 end
-plotHandle3 = findobj(axesHandle,'Type','Patch','FaceColor','r');
-plotHandle4 = findobj(axesHandle,'Type','Patch','FaceColor','k');
+plotHandle3 = findobj(axesHandle,'Type','Patch','FaceColor','r','EdgeColor','r');
+plotHandle4 = findobj(axesHandle,'Type','Patch','FaceColor','k','EdgeColor','k');
+plotHandle = findobj(axesHandle,'Type','line','Color',[.9 .9 .9]);
 for i=1:length(plotHandle)
-    set(plotHandle(i),'Color',[.6 .6 0.6],'Linestyle','--');
+    set(plotHandle(i),'Color',[.6 .6 .6],'Linestyle','--');
 end
 diground = @(x,d) round(x*10^d)/10^d; 
 AxesH = axes('Parent', f, ...
@@ -1972,7 +1971,13 @@ TextH = text(0,1, txt_figure, ...
   'HorizontalAlignment', 'left', ...
   'VerticalAlignment', 'top','Interpreter','latex','FontSize',11);
 
-if isempty(plotHandle4)&& isempty(plotHandle2) && ~isempty(plotHandle) && ~isempty(plotHandle1) && ~isempty(plotHandle3)
+if isempty(plotHandle1) && isempty(plotHandle2) && ~isempty(plotHandle3) && ~isempty(plotHandle4) && ~isempty(plotHandle)
+    h=legend([ plotHandle(1) plotHandle3(1) plotHandle4(1)],{'Edge under frustation', '$\uparrow$ Red sample group', '$\uparrow$ Black sample group'});
+elseif isempty(plotHandle1) && isempty(plotHandle2) && isempty(plotHandle3) && ~isempty(plotHandle4) && ~isempty(plotHandle)
+    h=legend([ plotHandle(1) plotHandle4(1)],{'Edge under frustation', '$\uparrow$ Black sample group'});
+elseif isempty(plotHandle1) && isempty(plotHandle2) && ~isempty(plotHandle3) && isempty(plotHandle4) && ~isempty(plotHandle)
+    h=legend([ plotHandle(1) plotHandle3(1)],{'Edge under frustation', '$\uparrow$ Red sample group'});    
+elseif isempty(plotHandle4)&& isempty(plotHandle2) && ~isempty(plotHandle) && ~isempty(plotHandle1) && ~isempty(plotHandle3)
     h=legend([plotHandle1(1) plotHandle(1) plotHandle3(1)],{'PC-corr $> 0$', 'Edge under frustation', '$\uparrow$ Red sample group'});
 elseif isempty(plotHandle1)&& isempty(plotHandle3) && ~isempty(plotHandle) && ~isempty(plotHandle2) && ~isempty(plotHandle4)
     h=legend([plotHandle2(1) plotHandle(1) plotHandle4(1)],{'PC-corr $< 0$', 'Edge under frustation', '$\uparrow$ Black sample group'});
@@ -1980,25 +1985,25 @@ elseif isempty(plotHandle2)&& ~isempty(plotHandle3) && ~isempty(plotHandle) && ~
     h=legend([plotHandle1(1) plotHandle(1) plotHandle3(1) plotHandle4(1)],{'PC-corr $> 0$', 'Edge under frustation', '$\uparrow$ Red sample group', '$\uparrow$ Black sample group'});
 elseif isempty(plotHandle1)&& ~isempty(plotHandle3) && ~isempty(plotHandle) && ~isempty(plotHandle2) && ~isempty(plotHandle4)
     h=legend([plotHandle2(1) plotHandle(1) plotHandle3(1) plotHandle4(1)],{'PC-corr $< 0$', 'Edge under frustation', '$\uparrow$ Red sample group', '$\uparrow$ Black sample group'});
-elseif isempty(plotHandle3)&& isempty(plotHandle2)
+elseif isempty(plotHandle3)&& isempty(plotHandle2) && ~isempty(plotHandle1) && ~isempty(plotHandle4)
     if isempty(plotHandle)
         h=legend([plotHandle1(1) plotHandle4(1)],{'PC-corr $> 0$','$\uparrow$ Black sample group'}); %only black nodes
     else
         h=legend([plotHandle1(1) plotHandle(1) plotHandle4(1)],{'PC-corr $> 0$', 'Edge under frustation','$\uparrow$ Black sample group'}); %only black nodes
     end
-elseif isempty(plotHandle4)&& isempty(plotHandle2)
+elseif isempty(plotHandle4)&& isempty(plotHandle2)&& ~isempty(plotHandle1) && ~isempty(plotHandle3)
     if isempty(plotHandle)
         h=legend([plotHandle1(1) plotHandle3(1)],{'PC-corr $> 0$','$\uparrow$ Red sample group'}); %only red nodes
     else
         h=legend([plotHandle1(1) plotHandle(1) plotHandle3(1)],{'PC-corr $> 0$','Edge under frustation','$\uparrow$ Red sample group'}); %only red nodes
     end
-elseif isempty(plotHandle2)
+elseif isempty(plotHandle2) && ~isempty(plotHandle1) && ~isempty(plotHandle3) && ~isempty(plotHandle4)
     if isempty(plotHandle)
         h=legend([plotHandle1(1) plotHandle3(1) plotHandle4(1)],{'PC-corr $> 0$','$\uparrow$ Red sample group','$\uparrow$ Black sample group'}); %only positive PC-corr
     else
         h=legend([plotHandle1(1) plotHandle(1) plotHandle3(1) plotHandle4(1)],{'PC-corr $> 0$','Edge under frustation','$\uparrow$ Red sample group','$\uparrow$ Black sample group'}); %only positive PC-corr
     end
-elseif isempty(plotHandle1)
+elseif isempty(plotHandle1) && ~isempty(plotHandle2) && ~isempty(plotHandle3) && ~isempty(plotHandle4)
     if isempty(plotHandle)
         h=legend([plotHandle2(1) plotHandle3(1) plotHandle4(1)],{'PC-corr $< 0$','$\uparrow$ Red sample group','$\uparrow$ Black sample group'}); %only negative PC-corr
     else
@@ -2014,7 +2019,10 @@ end
 set(h,'Interpreter','latex','FontSize',11)
 
 
-
+% elseif ~isempty(plotHandle1) && ~isempty(plotHandle2) && ~isempty(plotHandle) && (sum(plotHandle2==plotHandle)==length(plotHandle)) && ~isempty(plotHandle3) && ~isempty(plotHandle4)
+%     h=legend([plotHandle1(1) plotHandle(1) plotHandle3(1) plotHandle4(1)],{'PC-corr $> 0$','Edge under frustation', '$\uparrow$ Red sample group','$\uparrow$ Black sample group'});
+% elseif ~isempty(plotHandle1) && ~isempty(plotHandle2) && ~isempty(plotHandle) && (sum(plotHandle1==plotHandle)==length(plotHandle)) && ~isempty(plotHandle3) && ~isempty(plotHandle4)
+%     h=legend([plotHandle2(1) plotHandle(1) plotHandle3(1) plotHandle4(1)],{'PC-corr $< 0$','Edge under frustation', '$\uparrow$ Red sample group','$\uparrow$ Black sample group'});
 
 
 function RemoveSheet123(excelFileName,sheetName)
