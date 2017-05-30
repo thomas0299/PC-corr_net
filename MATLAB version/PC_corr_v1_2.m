@@ -14,7 +14,7 @@
 %   x => (Numeric matrix MxN) Dataset with samples on the rows and features on the columns
 %   sample_labels => (Cell array Mx1) Labels of the samples
 %   feat_names => (Cell array Nx1) Names of the features
-%   sample_names=> (Cell array NX1) Names of the samples
+%   sample_names=> (Cell array Mx1) Names of the samples
 %   dis=>'yes' or 'no', depending if you want to display the sample names
 %   in the scatterplot. Default: 'no'
 
@@ -41,7 +41,7 @@
 %           (that is a cell array with the same structure as in the single cut-off case)
 
 
-function [Edges,Nodes]=PC_corr_v1_2_19_5_2017(x,sample_labels,feat_names, sample_names,dis)
+function [Edges,Nodes]=PC_corr_v1_2(x,sample_labels,feat_names, sample_names,dis)
 
 %% initialisation and default options
 if nargin<4, error('Not Enough Input Arguments'); end
