@@ -1192,9 +1192,14 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
     col_plot <- c(col_plot,col[i])
   }
   
-  gx_Main <- ggplot(data_plt_all, aes(dim1,dim2)) + geom_point(aes(fill = gr),color="black",pch=21, size=5)+ scale_fill_manual(values = col_plot) + theme(legend.title=element_blank())+
-    theme(legend.position=c(1,1),legend.justification=c(0.95,0.95),legend.background = element_rect(colour = 'black', fill = 'gray90', size = 0.5, linetype='solid'))
-  
+  if (dis == 'yes'){
+    gx_Main <- ggplot(data_plt_all, aes(dim1,dim2)) + geom_point(aes(fill = gr),color="black",pch=21, size=5)+ geom_text_repel(aes(data_plt_all$dim1,data_plt_all$dim2, label = data_plt_all$label))+ scale_fill_manual(values = col_plot) + theme(legend.title=element_blank())+
+      theme(legend.position=c(1,1),legend.justification=c(0.95,0.95),legend.background = element_rect(colour = 'black', fill = 'gray90', size = 0.5, linetype='solid'))
+  } else if (dis == 'no'){
+    gx_Main <- ggplot(data_plt_all, aes(dim1,dim2)) + geom_point(aes(fill = gr),color="black",pch=21, size=5)+ scale_fill_manual(values = col_plot) + theme(legend.title=element_blank())+
+      theme(legend.position=c(1,1),legend.justification=c(0.95,0.95),legend.background = element_rect(colour = 'black', fill = 'gray90', size = 0.5, linetype='solid'))
+    
+  }
   
   # Labels in the axes ------------------------------------------------------
   # 2 Groups of labels ------------------------------------------------------
