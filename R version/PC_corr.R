@@ -55,6 +55,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
   library(pROC)
   library(ROCR)
   library(caTools)
+  library(ggrepel)
   
   n<-nargs()
   if (n<4){
