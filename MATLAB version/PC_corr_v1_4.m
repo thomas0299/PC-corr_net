@@ -41,7 +41,7 @@
 %           (that is a cell array with the same structure as in the single cut-off case)
 
 
-function [Edges,Nodes]=PC_corr_v1_3_29_6_2017(x,sample_labels,feat_names, sample_names,dis)
+function [Edges,Nodes]=PC_corr_v1_4_26_9_2017(x,sample_labels,feat_names, sample_names,dis)
 
 %% initialisation and default options
 if nargin<4, error('Not Enough Input Arguments'); end
@@ -173,20 +173,20 @@ for i = 1:length(norm)
                     flag = 1;
                     AUC_nc{i,j,k} = 1-AUC_nc{i,j,k};
                     % Compute AUPR
-                    [~,~,~,AUPR_nc{i,j,k}] = perfcurve(samp_lab,scores_nc,nameLabels{m},'xCrit','reca','yCrit','prec');
+                    AUPR_nc{i,j,k} = aupr_evaluation(samp_lab,scores_nc,nameLabels{m});
                 else
                     % Compute AUPR
-                    [~,~,~,AUPR_nc{i,j,k}] = perfcurve(samp_lab,scores_nc,nameLabels{n},'xCrit','reca','yCrit','prec');
+                    AUPR_nc{i,j,k} = aupr_evaluation(samp_lab,scores_nc,nameLabels{n});
                 end 
                 
                 if AUC_c{i,j,k}<0.5
                     flag = 1;
                     AUC_c{i,j,k} = 1-AUC_c{i,j,k};
                     % Compute AUPR
-                    [~,~,~,AUPR_c{i,j,k}] = perfcurve(samp_lab,scores_c,nameLabels{m},'xCrit','reca','yCrit','prec');
+                    AUPR_c{i,j,k} = aupr_evaluation(samp_lab,scores_c,nameLabels{m});
                 else
                     % Compute AUPR
-                    [~,~,~,AUPR_c{i,j,k}] = perfcurve(samp_lab,scores_c,nameLabels{n},'xCrit','reca','yCrit','prec');
+                    AUPR_c{i,j,k} = aupr_evaluation(samp_lab,scores_c,nameLabels{n});
                 end
                 
 
@@ -1638,7 +1638,23 @@ for k=1:length(cutoff)
     end
 end
 
+function aupr = aupr_evaluation(samp_lab,scores,positiveLabel) 
 
+[rec,prec,~,~] = perfcurve(samp_lab,scores,positiveLabel,'xCrit','reca','yCrit','prec');
+
+% rec is the recall, prec is the precision.
+% the first value of rec (at recall 0) is NaN (by definition, PRECISION = TP / (FP + TP))
+% at recall 0 we have PRECISION = 0/(0 + 0) (we don't have neither TP nor FP)
+% if at the first point of recall (prec(2)) the precision is 1, the NaN is changed
+% for 1, in the contrary case (in the first point we have a FP), the NaN is changed for 0
+if prec(2) == 1
+    prec(1) = 1;
+else
+    prec(1) = 0;
+end
+
+aupr = trapz(rec,prec);
+   
 
 function scatter_plot(s,col,sample_names,dis)
 
