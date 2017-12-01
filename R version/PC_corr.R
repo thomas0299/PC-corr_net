@@ -209,7 +209,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
     latent_c <-(sc^2)/(dim(x)[1]-1) # component variance 
     explained_c[[i]] <- 100*latent_c/sum(latent_c) # explained variance (%)
     
-    for (k in  1:length(labels)){ #dimension
+    for (k in  1:dim(ncPCA[[i]])[2]){ #dimension
       
       if ((u_lab == 'c')|(u_lab == 'd')){
         n <- 1
