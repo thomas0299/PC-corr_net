@@ -41,7 +41,7 @@
 #            -second column: respective node table in the PC-corr network  for each cut-off 
 #            (that is a data frame with the same structure as in the single cut-off case)
 
-PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
+PC_corr_01_12_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
   
   # initialisation and default options --------------------------------------
   
@@ -169,22 +169,27 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
 
   
   #  ------------------------------------------------------------------------
+  if (length(labels) <= length(feat_names)){
+    dimension_PCA <- length(labels)
+  } else {
+    dimension_PCA <- length(feat_names)
+  }
   pc_nc<- matrix(list(),12,1)
   pc_c<- matrix(list(),12,1)
   ncPCA<- pc_nc
   cPCA<- pc_c
   explained_nc <- matrix(list(),12,1)
   explained_c <- matrix(list(),12,1)
-  mw_ncPCA <- array(NA,dim=c(length(norm),choose(numbLabels,2),length(labels)))
+  mw_ncPCA <- array(NA,dim=c(length(norm),choose(numbLabels,2),dimension_PCA))
   mw_cPCA <- mw_ncPCA
-  AUC_nc <- array(NA,dim=c(length(norm),choose(numbLabels,2),length(labels)))
+  AUC_nc <- array(NA,dim=c(length(norm),choose(numbLabels,2),dimension_PCA))
   AUC_c <- AUC_nc
   response <- c()
-  AUPR_nc <- array(NA,dim=c(length(norm),choose(numbLabels,2),length(labels)))
+  AUPR_nc <- array(NA,dim=c(length(norm),choose(numbLabels,2),dimension_PCA))
   AUPR_c <- AUPR_nc
-  rank_pears_corr_ncPCA <- array(NA,dim=c(length(norm),length(labels),1))
+  rank_pears_corr_ncPCA <- array(NA,dim=c(length(norm),dimension_PCA,1))
   rank_pears_corr_cPCA <- rank_pears_corr_ncPCA
-  rank_spear_corr_ncPCA <- array(NA,dim=c(length(norm),length(labels),1))
+  rank_spear_corr_ncPCA <- array(NA,dim=c(length(norm),dimension_PCA,1))
   rank_spear_corr_cPCA <- rank_spear_corr_ncPCA
 
   flag <- 0 
@@ -294,16 +299,16 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
   }
   
   # Constructing the table of results ---------------------------------------
-  norms <- rep(norms,times=length(labels)*2)
-  centred <- rep('yes',times=length(labels)*12)
-  non_centred <- rep('no',times=length(labels)*12)
+  norms <- rep(norms,times=dim(ncPCA[[1]])[2]*2)
+  centred <- rep('yes',times=dim(ncPCA[[1]])[2]*12)
+  non_centred <- rep('no',times=dim(ncPCA[[1]])[2]*12)
   centr <- c(non_centred,centred)
-  dim <- 1:length(labels)
+  dim <- 1:dim(ncPCA[[1]])[2]
   dim <- rep(dim, each=12)
   dim <- c(dim,dim)
-  variance_c <- matrix(unlist(explained_c),nrow = 12, ncol = length(labels) , byrow=TRUE)
+  variance_c <- matrix(unlist(explained_c),nrow = 12, ncol = dim(ncPCA[[1]])[2] , byrow=TRUE)
   variance_c <- as.vector(variance_c)
-  variance_nc <- matrix(unlist(explained_nc),nrow = 12, ncol = length(labels) , byrow=TRUE)
+  variance_nc <- matrix(unlist(explained_nc),nrow = 12, ncol = dim(ncPCA[[1]])[2] , byrow=TRUE)
   variance_nc <- as.vector(variance_nc)
   variance <- c(variance_nc,variance_c)
   
@@ -790,7 +795,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
     cat('\nSelect the dimension for generating the PC-corr network:\n\n')
     u_dim <- readline(prompt="-> ")
     storage.mode(u_dim) <- "numeric"
-    if ((u_dim > 0) & (u_dim <= length(labels))){
+    if ((u_dim > 0) & (u_dim <= dim(ncPCA[[1]])[2])){
       flag <- 1
     } else{
       cat("Please introduce an existing dimension.\n")
@@ -964,7 +969,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
         val <- min(mw_PCA[u_norm,1,])
         ind1 <- which.min(mw_PCA[u_norm,1,])
         if (ind1 == u_dim){
-          if (ind1 == length(labels)){
+          if (ind1 == dim(ncPCA[[1]])[2]){
             val <- min(mw_PCA[u_norm,1,1:(ind1-1)])
             ind2 <- which.min(mw_PCA[u_norm,1,1:(ind1-1)])
           } else if (ind1 ==1){
@@ -979,7 +984,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
         val <- min(colMeans(apply(mw_PCA[u_norm, ,], c(1,2), as.numeric)))
         ind1 <- which.min(colMeans(apply(mw_PCA[u_norm, ,], c(1,2), as.numeric)))
         if (ind1 == u_dim){
-          if (ind1 == length(labels)){
+          if (ind1 == dim(ncPCA[[1]])[2]){
             val <- min(colMeans(apply(mw_PCA[u_norm, ,1:(ind1-1)], c(1,2), as.numeric)))
             ind2 <- which.min(colMeans(apply(mw_PCA[u_norm, ,1:(ind1-1)], c(1,2), as.numeric)))
           } else if (ind1 == 1) {
@@ -997,7 +1002,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
       val <- max(abs(unlist(mw_PCA[u_norm,1,])))
       ind1 <- which.max(abs(unlist(mw_PCA[u_norm,1,])))
       if (ind1 == u_dim){
-        if (ind1 == length(labels)){
+        if (ind1 == dim(ncPCA[[1]])[2]){
           val <- max(abs(unlist(mw_PCA[u_norm,1,1:(ind1-1)])))
           ind2 <- which.max(abs(unlist(mw_PCA[u_norm,1,1:(ind1-1)])))
         } else if (ind1 == 1){
@@ -1015,7 +1020,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
         val <- max(mw_PCA[u_norm,1,])
         ind1 <- which.max(mw_PCA[u_norm,1,])
         if (ind1 == u_dim){
-          if (ind1 ==length(labels)){
+          if (ind1 ==dim(ncPCA[[1]])[2]){
             val <- max(mw_PCA[u_norm,1,1:(ind1-1)])
             ind2 <- which.max(mw_PCA[u_norm,1,1:(ind1-1)])
           } else if (ind1 == 1){
@@ -1030,7 +1035,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
         val <- max(colMeans(apply(mw_PCA[u_norm, ,], c(1,2), as.numeric)))
         ind1 <- which.max(colMeans(apply(mw_PCA[u_norm, ,], c(1,2), as.numeric)))
         if (ind1 == u_dim){
-          if (ind1 == length(labels)){
+          if (ind1 == dim(ncPCA[[1]])[2]){
             val <- max(colMeans(apply(mw_PCA[u_norm, ,1:(ind1-1)], c(1,2), as.numeric)))
             ind2 <- which.max(colMeans(apply(mw_PCA[u_norm, ,1:(ind1-1)], c(1,2), as.numeric)))
           } else if (ind1 == 1){
@@ -1047,7 +1052,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
     val <- max(abs(mw_PCA[u_norm,1,]))
     ind1 <- which.max(abs(mw_PCA[u_norm,1,]))
     if (ind1 == u_dim){
-      if (ind1 == length(labels)){
+      if (ind1 == dim(ncPCA[[1]])[2]){
         val <- max(abs(unlist(mw_PCA[u_norm,1,1:(ind1-1)])))
         ind2 <- which.max(abs(unlist(mw_PCA[u_norm,1,1:(ind1-1)])))
       } else if (ind1 == 1) {
@@ -1528,7 +1533,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
   # bar plots ----------------------------------------------------------------
   if (numbLabels == 2){
     if ((u_rank !='pc') && (u_rank!='sc')){
-      bar_data <- data.frame(dimens=factor(1:length(labels)),evaluator=mw_PCA[u_norm,1,])
+      bar_data <- data.frame(dimens=factor(1:dim(ncPCA[[1]])[2]),evaluator=mw_PCA[u_norm,1,])
       g1 <- ggplot(data=bar_data, aes(x=dimens,y=evaluator)) + geom_bar(stat='identity',fill='steelblue')
     } else {
       a1 <- which(mw_PCA[u_norm,1,] >= 0)
@@ -1536,7 +1541,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
       lev <- c()
       lev[a1] <- "pos"
       lev[a2] <- "neg"
-      bar_data <- data.frame(dimens=factor(1:length(labels)),evaluator=abs(mw_PCA[u_norm,1,]),lev)
+      bar_data <- data.frame(dimens=factor(1:dim(ncPCA[[1]])[2]),evaluator=abs(mw_PCA[u_norm,1,]),lev)
       g1 <- ggplot(data=bar_data, aes(x=dimens,y=evaluator,fill=lev)) + geom_bar(stat='identity') 
       if (u_rank == 'pc'){
         g1 <- g1 +  theme(legend.title = element_blank())+ scale_fill_manual(labels = c("Pear. corr < 0","Pear. corr \u2265 0"),values=c("#808080", "#000000"))
@@ -1547,7 +1552,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
   } else {
     if ((u_lab == 'c')||(u_lab == 'd')){
       if ((u_rank !='pc') && (u_rank!='sc')){
-        bar_data <- data.frame(dimens=factor(1:length(labels)),evaluator=colMeans(mw_PCA[u_norm,,]))
+        bar_data <- data.frame(dimens=factor(1:dim(ncPCA[[1]])[2]),evaluator=colMeans(mw_PCA[u_norm,,]))
         g1 <- ggplot(data=bar_data, aes(x=dimens,y=evaluator)) + geom_bar(stat='identity',fill='steelblue')
       } else {
         a1 <- which(mw_PCA[u_norm,1,] >= 0)
@@ -1555,7 +1560,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
         lev <- c()
         lev[a1] <- "pos"
         lev[a2] <- "neg"
-        bar_data <- data.frame(dimens=factor(1:length(labels)),evaluator=abs(mw_PCA[u_norm,1,]),lev)
+        bar_data <- data.frame(dimens=factor(1:dim(ncPCA[[1]])[2]),evaluator=abs(mw_PCA[u_norm,1,]),lev)
         g1 <- ggplot(data=bar_data, aes(x=dimens,y=evaluator,fill=lev)) + geom_bar(stat='identity') 
         if (u_rank == 'pc'){
           g1 <- g1 +  theme(legend.title = element_blank())+ scale_fill_manual(labels = c("Pear. corr < 0","Pear. corr \u2265 0"),values=c("#808080", "#000000"))
@@ -1569,7 +1574,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
       lev <- c()
       lev[a1] <- "pos"
       lev[a2] <- "neg"
-      bar_data <- data.frame(dimens=factor(1:length(labels)),evaluator=abs(mw_PCA[u_norm,1,]),lev)
+      bar_data <- data.frame(dimens=factor(1:dim(ncPCA[[1]])[2]),evaluator=abs(mw_PCA[u_norm,1,]),lev)
       g1 <- ggplot(data=bar_data, aes(x=dimens,y=evaluator,fill=lev)) + geom_bar(stat='identity') 
       if (u_rank == 'pc'){
         g1 <- g1 +  theme(legend.title = element_blank())+ scale_fill_manual(labels = c("Pear. corr < 0","Pear. corr \u2265 0"),values=c("#808080", "#000000"))
@@ -1587,7 +1592,7 @@ PC_corr_19_5_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
   }
   
   
-  explain_var <- data.frame(dimens=factor(1:length(labels)),explain=explained[[u_norm]])
+  explain_var <- data.frame(dimens=factor(1:dim(ncPCA[[1]])[2]),explain=explained[[u_norm]])
   g2 <- ggplot(data=explain_var, aes(x=dimens, y= explain))+ geom_bar(stat='identity', fill='steelblue') + labs(title= 'Explained variance for the respective principal components', x= 'PC', y =  'Explained Variance (%)') + theme(plot.title = element_text(hjust = 0.5), axis.text.x=element_text(angle=90, vjust= 0.5, hjust = 1))
   
   dev.new()
