@@ -41,7 +41,7 @@
 #            -second column: respective node table in the PC-corr network  for each cut-off 
 #            (that is a data frame with the same structure as in the single cut-off case)
 
-PC_corr_01_12_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
+PC_corr_11_12_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
   
   # initialisation and default options --------------------------------------
   
@@ -131,6 +131,21 @@ PC_corr_01_12_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
   norm[[12]] <- x  #No normalization
   norms[12] <- '-' 
   
+  
+  inf_norm <- c()
+  nan_norm <- c()
+  nonreal_norm <- c()
+  for (i in 1:length(norm)){
+    inf_norm[i] <- sum(is.infinite(norm[[i]]))
+    nan_norm[i] <- sum(is.nan(norm[[i]]))
+    nonreal_norm[i] <- is.complex(norm[[i]])
+  }
+  
+  probl_norm <- inf_norm + nan_norm + nonreal_norm
+  norm <- norm[!probl_norm]
+  norms <- norms[!probl_norm]
+  norms_list <- norms
+  
   #  ------------------------------------------------------------------------
   u_lab <- c( )
   flag <- 0
@@ -174,12 +189,12 @@ PC_corr_01_12_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
   } else {
     dimension_PCA <- length(feat_names)
   }
-  pc_nc<- matrix(list(),12,1)
-  pc_c<- matrix(list(),12,1)
+  pc_nc<- matrix(list(),length(norm),1)
+  pc_c<- matrix(list(),length(norm),1)
   ncPCA<- pc_nc
   cPCA<- pc_c
-  explained_nc <- matrix(list(),12,1)
-  explained_c <- matrix(list(),12,1)
+  explained_nc <- matrix(list(),length(norm),1)
+  explained_c <- matrix(list(),length(norm),1)
   mw_ncPCA <- array(NA,dim=c(length(norm),choose(numbLabels,2),dimension_PCA))
   mw_cPCA <- mw_ncPCA
   AUC_nc <- array(NA,dim=c(length(norm),choose(numbLabels,2),dimension_PCA))
@@ -300,15 +315,15 @@ PC_corr_01_12_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
   
   # Constructing the table of results ---------------------------------------
   norms <- rep(norms,times=dim(ncPCA[[1]])[2]*2)
-  centred <- rep('yes',times=dim(ncPCA[[1]])[2]*12)
-  non_centred <- rep('no',times=dim(ncPCA[[1]])[2]*12)
+  centred <- rep('yes',times=dim(ncPCA[[1]])[2]*length(norm))
+  non_centred <- rep('no',times=dim(ncPCA[[1]])[2]*length(norm))
   centr <- c(non_centred,centred)
   dim <- 1:dim(ncPCA[[1]])[2]
-  dim <- rep(dim, each=12)
+  dim <- rep(dim, each=length(norm))
   dim <- c(dim,dim)
-  variance_c <- matrix(unlist(explained_c),nrow = 12, ncol = dim(ncPCA[[1]])[2] , byrow=TRUE)
+  variance_c <- matrix(unlist(explained_c),nrow = length(norm), ncol = dim(ncPCA[[1]])[2] , byrow=TRUE)
   variance_c <- as.vector(variance_c)
-  variance_nc <- matrix(unlist(explained_nc),nrow = 12, ncol = dim(ncPCA[[1]])[2] , byrow=TRUE)
+  variance_nc <- matrix(unlist(explained_nc),nrow = length(norm), ncol = dim(ncPCA[[1]])[2] , byrow=TRUE)
   variance_nc <- as.vector(variance_nc)
   variance <- c(variance_nc,variance_c)
   
@@ -503,28 +518,28 @@ PC_corr_01_12_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
   } else {
     if ((u_lab=='c')|(u_lab=='d')){
       pval1 <- aperm(mw_ncPCA, c(1,3,2))
-      pval1 <- matrix(pval1,12*dim(mw_ncPCA)[3],choose(numbLabels,2))
+      pval1 <- matrix(pval1,length(norm)*dim(mw_ncPCA)[3],choose(numbLabels,2))
       storage.mode(pval1)<- "numeric"
       pval2 <- aperm(mw_cPCA,c(1,3,2))
-      pval2 <- matrix(pval2,12*dim(mw_cPCA)[3],choose(numbLabels,2))
+      pval2 <- matrix(pval2,length(norm)*dim(mw_cPCA)[3],choose(numbLabels,2))
       storage.mode(pval2)<- "numeric"
       pvals <- rbind(pval1,pval2)
       avg <- apply(pvals, 1, mean)
       
       AUC1 <- aperm(AUC_nc,c(1,3,2))
-      AUC1 <- matrix(AUC1,12*dim(mw_ncPCA)[3],choose(numbLabels,2))
+      AUC1 <- matrix(AUC1,length(norm)*dim(mw_ncPCA)[3],choose(numbLabels,2))
       storage.mode(AUC1)<- "numeric"
       AUC2 <- aperm(AUC_c,c(1,3,2))
-      AUC2 <- matrix(AUC2,12*dim(mw_cPCA)[3],choose(numbLabels,2))
+      AUC2 <- matrix(AUC2,length(norm)*dim(mw_cPCA)[3],choose(numbLabels,2))
       storage.mode(AUC2)<- "numeric"
       AUCs <- rbind(AUC1,AUC2)
       avg_AUC <- apply(AUCs, 1, mean)
       
       AUPR1 <- aperm(AUPR_nc,c(1,3,2))
-      AUPR1 <- matrix(AUPR1,12*dim(mw_ncPCA)[3],choose(numbLabels,2))
+      AUPR1 <- matrix(AUPR1,length(norm)*dim(mw_ncPCA)[3],choose(numbLabels,2))
       storage.mode(AUPR1)<- "numeric"
       AUPR2 <- aperm(AUPR_c,c(1,3,2))
-      AUPR2 <- matrix(AUPR2,12*dim(mw_cPCA)[3],choose(numbLabels,2))
+      AUPR2 <- matrix(AUPR2,length(norm)*dim(mw_cPCA)[3],choose(numbLabels,2))
       storage.mode(AUPR2)<- "numeric"
       AUPRs <- rbind(AUPR1, AUPR2)
       avg_AUPR <- apply(AUPRs, 1, mean)
@@ -765,13 +780,11 @@ PC_corr_01_12_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
   flag <- 0
   while (flag == 0){
     cat("\nSelect the normalization:\n\n")
+    cat("Example: LOG\n\n")
     u_norm_n <- readline(prompt="-> ")
     flag <- 1
-    normal <- c('DSOR', 'DSOC', 'LOG', 'ZSCORE', 'QUANTILE T', 'QUANTILE', 'ZSCORE T', 'PLUS(ABS(MIN))', 'PARETO SCALING', 'SQRT', 'MANORM',  '-')
-    if (sum(u_norm_n==normal)==1){
-      u_norm <- switch(u_norm_n, 'DSOR'= 1, 'DSOC'= 2, 'LOG'= 3, 'ZSCORE'= 4, 'QUANTILE T' = 5, 'QUANTILE' = 6,
-                       'ZSCORE T'= 7, 'PLUS(ABS(MIN))' = 8, 'PARETO SCALING'= 9, 'SQRT' = 10, 'MANORM' = 11, '-' = 12) 
-    } else {
+    u_norm <- which(norms_list %in% u_norm_n)
+    if (length(u_norm) == 0){
       flag <- 0
       cat("Please introduce the exact name of the normalization.\n")
     }
@@ -1642,20 +1655,24 @@ PC_corr_01_12_2017<-function(x,sample_labels,feat_names, sample_names,dis) {
     }   
     
 
-    
-    # - Normal Pearson Corrleation calculation
-    c <- cor(x)
-    
-    # - Apply the C-Corr formula
-    pc_corr <- matrix(0,length(V),length(V))
-    
-    for (i in 1:(length(V)-1)) {
-      for (j in (i+1):length(V)) {
-        pc_corr[i,j] <- sign(c[i,j]) * min(abs(c(c[i,j],V[i],V[j])))
-      }
+    if (length(V)>1){
+      # - Normal Pearson Corrleation calculation
+      c <- cor(x)
+      
+      # - Apply the C-Corr formula
+      pc_corr <- matrix(0,length(V),length(V))
+      
+      for (i in 1:(length(V)-1)) {
+        for (j in (i+1):length(V)) {
+          pc_corr[i,j] <- sign(c[i,j]) * min(abs(c(c[i,j],V[i],V[j])))
+        }
+      } 
+    } else {
+      pc_corr <- matrix(0,length(V),length(V))
     }
+
     
-    if(max(abs(pc_corr[,])) <= cutoff) {
+    if((max(abs(pc_corr[,])) <= cutoff)||(length(V)<=1)) {
       c_temp <- cor(x_temp)
       pc_corr_temp <- matrix(0,length(V_temp),length(V_temp))
       for (i in 1:(length(V_temp)-1)){
