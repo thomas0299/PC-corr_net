@@ -10,7 +10,5 @@ Omic science is rapidly growing and one of the most employed techniques to explo
 
 ### Contact
 For any problem, please contact:
-
 - Sara Ciucci:  [saraciuccipg@gmail.com](mailto:saraciuccipg@gmail.com)
-
 - Carlo Vittorio Cannistraci:  [kalokagathos.agon@gmail.com](mailto:kalokagathos.agon@gmail.com)
