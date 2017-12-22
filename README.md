@@ -1,4 +1,4 @@
-# PC-corr algorithm associate to PCA analysis
+# PC-corr algorithm associated to PCA analysis
 ### Enlightening discriminative network functional modules behind Principal Component Analysis separation in differential-omic science studies
 Article in [Scientific Reports 7, Article number: 43946 (2017), doi:10.1038/srep43946](http://www.nature.com/articles/srep43946)
 
