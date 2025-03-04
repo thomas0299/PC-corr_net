@@ -1,1 +1,5 @@
-&.xlsx
+*.xlsx
+.DS_Store
+.Rapp.history
+*.ipynb
+*.RData
