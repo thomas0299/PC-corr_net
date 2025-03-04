@@ -1,11 +1,11 @@
 ###### PC-corr algorithm associate to PCA analysis #####
 
 ### Released under MIT License
-### Copyright (c) 16 Dec 2017 Sara Ciucci, Yan Ge, Claudio Durán and Carlo Vittorio Cannistraci
+### Copyright (c) 16 Dec 2017 Sara Ciucci, Yan Ge, Claudio Dur?n and Carlo Vittorio Cannistraci
 
 # Please cite:
 # Enlightening discriminative network functional modules behind Principal Component Analysis separation in differential-omic science studies.
-# Sara Ciucci, Yan Ge, Claudio Durán, Alessandra Palladini, Víctor Jiménez Jiménez, Luisa María Martínez Sánchez, 
+# Sara Ciucci, Yan Ge, Claudio Dur?n, Alessandra Palladini, V?ctor Jim?nez Jim?nez, Luisa Mar?a Mart?nez S?nchez, 
 # Yuting Wang, Susanne Sales, Andrej Shevchenko, Steven W. Poser, Maik Herbig, Oliver Otto, Andreas Androutsellis-Theotokis, 
 # Jochen Guck, Mathias J. Gerl and Carlo Vittorio Cannistraci 
 # Scientific Reports, 2017
@@ -2092,7 +2092,9 @@ PC_corr_v2<-function(x,sample_labels,feat_names, sample_names,dis) {
   }
   
   dev.new()
-  grid.arrange(g1,g2, ncol=1, nrow=2)   
+  g1 <- g1 + theme(plot.title = element_text(size = 14))  
+  g2 <- g2 + theme(plot.title = element_text(size = 14))  
+  grid.arrange(g1,g2, ncol=1, nrow=2)
   
   
   # PC-corr -----------------------------------------------------------------
@@ -2688,6 +2690,12 @@ PC_corr_v2<-function(x,sample_labels,feat_names, sample_names,dis) {
       if ((dim(pc_corr1)[1] == 0) & (dim(pc_corr1)[2] == 0)){
         next
       } else{
+        
+        na_rows <- which(rowSums(is.na(nodes1)) > 0)
+        indices_to_remove <- nodes1$index[na_rows]
+        nodes1 <- nodes1[-na_rows, ]
+        pc_corr1 <- pc_corr1[-indices_to_remove, -indices_to_remove]
+        
         plot_graph(pc_corr1,nodes1,cut_off[k])
       }
     }
