@@ -2691,10 +2691,25 @@ PC_corr_v2<-function(x,sample_labels,feat_names, sample_names,dis) {
         next
       } else{
         
+        # Find rows with NA values
         na_rows <- which(rowSums(is.na(nodes1)) > 0)
-        indices_to_remove <- nodes1$index[na_rows]
-        nodes1 <- nodes1[-na_rows, ]
-        pc_corr1 <- pc_corr1[-indices_to_remove, -indices_to_remove]
+        
+        # Ensure indices_to_remove is numeric and non-NA
+        if (length(na_rows) > 0) {
+          indices_to_remove <- na.omit(as.numeric(nodes1$index[na_rows]))  # Ensure numeric type
+          
+          # Remove NA values from indices_to_remove
+          indices_to_remove <- indices_to_remove[!is.na(indices_to_remove)]
+          
+          # Remove rows from nodes1
+          nodes1 <- nodes1[-na_rows, , drop = FALSE]
+          
+          # Remove corresponding rows and columns from pc_corr1
+          if (length(indices_to_remove) > 0) {
+            pc_corr1 <- pc_corr1[-indices_to_remove, -indices_to_remove, drop = FALSE]
+          }
+        }
+        
         
         plot_graph(pc_corr1,nodes1,cut_off[k])
       }
