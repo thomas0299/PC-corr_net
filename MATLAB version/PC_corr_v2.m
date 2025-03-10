@@ -2034,21 +2034,25 @@ end
 % saving the PC-corr results in Excel spreadsheet file
 if length(cut_off) == 1
    disp(size(Edges(:,2)));
-    Edges_data = Edges{:,2};  % Ensure Edges{:,2} is the correct 2D array
+    Edges_data = Edges;  % Ensure Edges{:,2} is the correct 2D array
     if iscolumn(Edges_data)
         Edges_data = Edges_data';  % Convert to row if it's a column vector
     end
     
-    Nodes_data = Nodes{:,2};  % Same for Nodes
+    Nodes_data = Nodes;  % Same for Nodes
     if iscolumn(Nodes_data)
         Nodes_data = Nodes_data';  % Convert to row if it's a column vector
     end
     
+    Edges_data(:,3) = cellfun(@num2str, Edges_data(:,3), 'UniformOutput', false);
+    Edges_col_names = Edges_data(1, :);
+    Edges_data = Edges_data(2:end, :);
     Edges_data = cellstr(Edges_data);
     % Create tables from Edges and Nodes
-    Edges_table = cell2table(Edges_data, 'VariableNames', Edges(1,1));
-    Nodes_data = {Nodes_data}
-    Nodes_table = cell2table(Nodes_data, 'VariableNames', Nodes(1,1));
+    Edges_table = cell2table(Edges_data, 'VariableNames', Edges_col_names);
+    Nodes_data(:,3) = cellfun(@num2str, Nodes_data(:,3), 'UniformOutput', false);
+    Nodes_col_names = Nodes_data(1, :);
+    Nodes_table = cell2table(Nodes_data, 'VariableNames', Nodes_col_names);
     
     writetable(Edges_table, filename, 'Sheet', ['Edges-cutoff ', num2str(cut_off)]);
     writetable(Nodes_table, filename, 'Sheet', ['Nodes-cutoff ', num2str(cut_off)]);
@@ -2086,37 +2090,47 @@ end
 
 %% Graph plot for MATLAB 2015b and future releases
 
-% g = graph(pc_corr);
-% figure
-% h = plot(g);
-% labelnode(h,[1:size(nodes,1)-1],{nodes{2:end,1}})
-% idx = [1:size(nodes,1)-1];
-% highlight(h,[idx(sign([nodes{2:end,2}]) == -1)],'NodeColor','k')
-% highlight(h,[idx(sign([nodes{2:end,2}]) == 1)],'NodeColor','r')
-% highlight(h,[g.Edges.EndNodes(find(sign(g.Edges.Weight) == 1),1)],[g.Edges.EndNodes(find(sign(g.Edges.Weight) == 1),2)],'EdgeColor','r');
-% highlight(h,[g.Edges.EndNodes(find(sign(g.Edges.Weight) == -1),1)],[g.Edges.EndNodes(find(sign(g.Edges.Weight) == -1),2)],'EdgeColor','k');
+g = graph(pc_corr);
+figure
+h = plot(g);
+labelnode(h,[1:size(nodes,1)-1],{nodes{2:end,1}})
+
+num_nodes = size(nodes,1) - 1; 
+idx = 1:num_nodes;
+
+is_red = strcmp(nodes(2:end,2), 'Red');
+
+node_colors = repmat({'k'}, num_nodes, 1);
+node_colors(1:min(4, num_nodes)) = {'r'}
+
+for i = 1:num_nodes
+    highlight(h, idx(i), 'NodeColor', node_colors{i});
+end
+
+highlight(h,[g.Edges.EndNodes(find(sign(g.Edges.Weight) == 1),1)],[g.Edges.EndNodes(find(sign(g.Edges.Weight) == 1),2)],'EdgeColor','r');
+highlight(h,[g.Edges.EndNodes(find(sign(g.Edges.Weight) == -1),1)],[g.Edges.EndNodes(find(sign(g.Edges.Weight) == -1),2)],'EdgeColor','k');
 
 %% Biograph approach for generation of graph plot for MATLAB 2015a and previous releases
-if strcmp(u_vis_net,'y')
-    %Visualize the PC-corr networks
-    for k=1:length(cut_off)
-        if length(cut_off)==1
-            pc_corr1=pc_corr;
-            nodes1=Nodes;
-        else
-            pc_corr1=pc_corr{k,2};
-            nodes1=Nodes{k,2};
-        end
-        
-        if isempty(pc_corr1)
-            continue
-        else
-            
-            plot_graph(pc_corr1,nodes1,cut_off(k))
-            
-        end
-    end
-end
+% if strcmp(u_vis_net,'y')
+%     %Visualize the PC-corr networks
+%     for k=1:length(cut_off)
+%         if length(cut_off)==1
+%             pc_corr1=pc_corr;
+%             nodes1=Nodes;
+%         else
+%             pc_corr1=pc_corr{k,2};
+%             nodes1=Nodes{k,2};
+%         end
+% 
+%         if isempty(pc_corr1)
+%             continue
+%         else
+% 
+%             plot_graph(pc_corr1,nodes1,cut_off(k))
+% 
+%         end
+%     end
+% end
 
 
 
