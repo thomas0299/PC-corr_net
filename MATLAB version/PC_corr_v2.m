@@ -1,11 +1,11 @@
 %%%%% PC-corr algorithm associate to PCA analysis%%%%%
 
 %%% Released under MIT License
-%%% Copyright (c) 16 Dec 2017 Sara Ciucci, Yan Ge, Claudio Durán and Carlo Vittorio Cannistraci
+%%% Copyright (c) 16 Dec 2017 Sara Ciucci, Yan Ge, Claudio Durï¿½n and Carlo Vittorio Cannistraci
 
 % Please cite:
 % Enlightening discriminative network functional modules behind Principal Component Analysis separation in differential-omic science studies.
-% Sara Ciucci, Yan Ge, Claudio Durán, Alessandra Palladini, Víctor Jiménez Jiménez, Luisa María Martínez Sánchez, 
+% Sara Ciucci, Yan Ge, Claudio Durï¿½n, Alessandra Palladini, Vï¿½ctor Jimï¿½nez Jimï¿½nez, Luisa Marï¿½a Martï¿½nez Sï¿½nchez, 
 % Yuting Wang, Susanne Sales, Andrej Shevchenko, Steven W. Poser, Maik Herbig, Oliver Otto, Andreas Androutsellis-Theotokis, 
 % Jochen Guck, Mathias J. Gerl and Carlo Vittorio Cannistraci 
 % Scientific Reports, 2017
@@ -2163,7 +2163,7 @@ if meas_seg == 3
         else 
             fprintf('\nAre you sure? Do you want to compute for all? It will take some time (minutes). [y/n]');
         end
-        fprintf('\n[y] yes, I want to compute for all the cases\n[n] no, I don’t want to compute for all the cases\n\n')
+        fprintf('\n[y] yes, I want to compute for all the cases\n[n] no, I donï¿½t want to compute for all the cases\n\n')
         meas_seg_all = input('-> ','s');
         if strcmp(meas_seg_all,'y') || strcmp(meas_seg_all,'n')
             flag = 1;
@@ -2714,7 +2714,7 @@ end
 function plot_graph(pc_corr1,nodes1,cutoff)
 
 G=sparse(triu(pc_corr1));
-g=digraph(G, nodes1(2:end,1));
+g=biograph(G,nodes1(2:end,1),'ShowArrows','off','EdgeType','straight', 'NodeAutoSize','off');
 
 for i=1:(length(nodes1)-1)
     len_label(i)= length(nodes1{i+1,1});
@@ -2730,164 +2730,90 @@ else
     size_lab_nodes=8;
 end
 
-% Initialize node properties
-num_nodes = height(g.Nodes);
-
-% Set default shape for all nodes
-g.Nodes.Shape = repmat({'circle'}, num_nodes, 1);
-
-% Set node sizes
-g.Nodes.Size = repmat({[10, 10]}, num_nodes, 1);
-
-% Set font sizes
-g.Nodes.FontSize = repmat(size_lab_nodes, num_nodes, 1);
-
-% Set text color
-g.Nodes.TextColor = repmat({[0.5, 0.5, 0.57]}, num_nodes, 1);
-
-% Assign colors based on the second column of nodes1
-is_red = strcmp(nodes1(2:end, 2), 'Red'); % Compare excluding the header
-colors = repmat({[0 0 0]}, num_nodes, 1); % Default black
-line_colors = repmat({[0 0 0]}, num_nodes, 1); % Default black
-
-% Assign red where applicable
-colors(is_red) = {[1 0 0]}; % Red color
-line_colors(is_red) = {[1 0 0]}; % Red line color
-
-% Assign colors to table
-g.Nodes.Color = colors;
-g.Nodes.LineColor = line_colors;
-
-edg_w = g.Edges.Weight;
-
-% Get max and min edge weights
-max_edg_w = max(edg_w);
-min_edg_w = min(edg_w);
-
-% Initialize edge colors
-edge_colors = repmat({[0, 0, 0]}, height(g.Edges), 1); % Default black
-
-% Process edge colors based on sign of weight
-for i = 1:height(g.Edges)
-    if edg_w(i) > 0  % Positive weight
-        color_edg = 1 - edg_w(i) / max_edg_w;
-        edge_colors{i} = [1, color_edg, color_edg];  % Red shades
-    else  % Negative weight
-        color_edg = edg_w(i) / abs(min_edg_w) + 1;
-        edge_colors{i} = [color_edg, color_edg, color_edg];  % White-to-black shades
+for i=1:length(g.nodes)
+    g.nodes(i).Shape='circle';
+    g.nodes(i).Size=[10,10];
+    g.nodes(i).FontSize=size_lab_nodes;
+    g.nodes(i).TextColor=[0.5 0.5 0.57];
+    if strcmp(nodes1{i+1,2},'Red')
+        g.nodes(i).Color=[1 0 0];
+        g.nodes(i).LineColor=[1 0 0];
+    else
+        g.nodes(i).Color=[0 0 0];
+        g.nodes(i).LineColor=[0 0 0];
     end
 end
 
-% Assign edge colors to the graph table
-g.Edges.LineColor = edge_colors;
+for i=1:length(g.edges)
+    edg_w(i)=g.edges(i).Weight;
+end
 
-% Initialize frustration edge counter
-edg_frust = 0;
-
-% Extract node names as a string array
-node_names = string(g.Nodes.Name);  
-
-% Extract source and target nodes
-source_nodes = string(g.Edges.EndNodes(:,1));  
-target_nodes = string(g.Edges.EndNodes(:,2));
-
-% Convert node names to indices
-[~, src_idx] = ismember(source_nodes, node_names);  
-[~, tgt_idx] = ismember(target_nodes, node_names);
-
-% Extract edge weights
-edge_weights = g.Edges.Weight;
-
-% Initialize edge colors (default black)
-edge_colors = repmat({[0, 0, 0]}, height(g.Edges), 1);
-
-% Check which nodes are 'Red'
-is_red = strcmp(nodes1(2:end,2), 'Red'); % Logical array for red nodes
-
-% Iterate through all edges and determine frustrated edges
-edg_frust = 0;
-for i = 1:height(g.Edges)
-    % Get the numeric indices of source and target
-    src = src_idx(i);
-    tgt = tgt_idx(i);
-
-    % Check if the nodes are red
-    n = is_red(src);
-    m = is_red(tgt);
-
-    % Apply frustration conditions
-    if (n * m == 1 && edge_weights(i) < 0) || ...
-       (n + m == 0 && edge_weights(i) < 0) || ...
-       (n + m == 1 && edge_weights(i) > 0)
-
-        edge_colors{i} = [0.9, 0.9, 0.9]; % Gray color for frustration
-        edg_frust = edg_frust + 1; % Count frustrated edges
+for i=1:length(g.edges)
+    max_edg_w=max(edg_w);
+    min_edg_w=min(edg_w);
+    if sign(g.edges(i).Weight)==1
+        color_edg=1-g.edges(i).Weight/max_edg_w;
+        g.edges(i).LineColor=[1 color_edg color_edg];
+    else
+        color_edg=g.edges(i).Weight/abs(min_edg_w)+1;
+        g.edges(i).LineColor=[color_edg color_edg color_edg];
     end
 end
 
-% Assign edge colors to graph table
-g.Edges.LineColor = edge_colors;
-
-
-
-val_red = [];
-val_black = [];
-
-% Extract edge colors from the table
-edge_colors = cell2mat(g.Edges.LineColor); % Convert cell array to numeric matrix
-
-% Iterate over edges
-for i = 1:height(g.Edges)
-    % Condition for red edges (Red = [1, X, X])
-    if (edge_colors(i,1) == 1) && (edge_colors(i,2) ~= 0)
-        val_red = [val_red, edge_colors(i,2)];
+%Edge under frustration are in grey colour.
+edg_frust=0;
+for i=1:length(g.nodes)-1
+    for j=i+1:length(g.nodes)
+        eh1 = getedgesbynodeid(g,g.nodes(i).ID,g.nodes(j).ID);
+        if isempty(eh1)
+            continue
+        else
+            n=strcmp(nodes1{i+1,2},'Red');
+            m=strcmp(nodes1{j+1,2},'Red');
+            if (n*m==1)&&(sign(eh1.Weight)==-1)
+                eh1.LineColor=[0.9 0.9 0.9];
+                edg_frust=edg_frust+1;
+            elseif (n+m==0)&&(sign(eh1.Weight)==-1)
+                eh1.LineColor=[0.9 0.9 0.9];
+                edg_frust=edg_frust+1;
+            elseif (n+m==1)&& (sign(eh1.Weight)==1)
+                eh1.LineColor=[0.9 0.9 0.9];
+                edg_frust=edg_frust+1;
+            end
+        end
     end
+end
 
-    % Condition for black edges (Not red and not frustrated gray [0.9, 0.9, 0.9])
-    if (edge_colors(i,1) ~= 1) && (edge_colors(i,1) ~= 0.9)
-        val_black = [val_black, edge_colors(i,1)];
+val_red=[];
+val_black=[];
+for i=1:length(g.edges)
+    if (g.edges(i).LineColor(1)==1) && (g.edges(i).LineColor(2)~=0)
+        val_red=[val_red g.edges(i).LineColor(2)];
+    else
+         val_red=[val_red];
+    end
+    if (g.edges(i).LineColor(1)~=1) && (g.edges(i).LineColor(1)~=0.9)
+        val_black=[val_black g.edges(i).LineColor(1)];
+    else
+        val_black=[val_black];
     end
 end
+min_red=min(val_red);
+min_black=min(val_black);
 
-% Handle cases where arrays might be empty
-if ~isempty(val_red)
-    min_red = min(val_red);
-else
-    min_red = NaN; % No red edges found
-end
-
-if ~isempty(val_black)
-    min_black = min(val_black);
-else
-    min_black = NaN; % No black edges found
-end
-
-
-% Create a new figure for the graph
-f = figure(); 
-set(f, 'HandleVisibility', 'on');
-
-% Plot the digraph
-h = plot(g, 'Layout', 'force');
-
-% Set figure properties
-set(f, 'Units', 'points');  
-set(f, 'Color', [1 1 1]);  
-
-% Adjust figure position
-set(f, 'Position', get(f, 'Position'));
-
-% Optional: Customize Node & Edge Properties
-h.NodeColor = cell2mat(g.Nodes.Color);  % Apply node colors
-h.EdgeColor = cell2mat(g.Edges.LineColor);  % Apply edge colors
-
-% Keep figure open and prevent auto-close
-hold on;
-
+bg=biograph.bggui(g);
+f1=get(bg.biograph.hgAxes,'Parent');
+set(f1, 'HandleVisibility', 'on')
+f = figure();
+copyobj(bg.biograph.hgAxes,f);
+set(f,'units','points');
+set(f,'Position',f1.Position);
+set(f,'Color',[1 1 1])
+close(bg.hgFigure);
 
 
 %Replace the grey edges (edges under frustration) in the figure with dashed grey edges 
-fr_edg_frust=edg_frust/height(g.Edges);
+fr_edg_frust=edg_frust/length(g.edges);
 axesHandle = gca;
 plotHandle1 = findobj(axesHandle,'Type','line','Color',[1 0 0]);
 if isempty(plotHandle1)
@@ -2911,7 +2837,7 @@ AxesH = axes('Parent', f, ...
   'XLim', [0, 1], ...
   'YLim', [0, 1], ...
   'NextPlot', 'add');
-frac_txt=['$\displaystyle\frac{',num2str(edg_frust),'}{',num2str(height(g.Edges)),'}$'];
+frac_txt=['$\displaystyle\frac{',num2str(edg_frust),'}{',num2str(length(g.edges)),'}$'];
 txt_figure={[],['   cut-off = ',num2str(cutoff)],[],['   frustration = ',frac_txt,' = ',num2str(diground(fr_edg_frust,3)*100),'\%']};
 
 TextH = text(0,1, txt_figure, ...
@@ -2963,8 +2889,7 @@ elseif ~isempty(plotHandle1)&& ~isempty(plotHandle2) && ~isempty(plotHandle3) &&
         h=legend([plotHandle1(1) plotHandle2(1) plotHandle(1) plotHandle3(1) plotHandle4(1)],{'PC-corr $> 0$','PC-corr $< 0$','Edge under frustation', '$\uparrow$ Red sample group','$\uparrow$ Black sample group'});
     end
 end
-h.NodeFontSize = 11; % Set font size
-h.Interpreter = 'latex'; % Set LaTeX interpreter for labels
+set(h,'Interpreter','latex','FontSize',11)
 
 
 % elseif ~isempty(plotHandle1) && ~isempty(plotHandle2) && ~isempty(plotHandle) && (sum(plotHandle2==plotHandle)==length(plotHandle)) && ~isempty(plotHandle3) && ~isempty(plotHandle4)
@@ -3011,7 +2936,7 @@ end
 
 
 if nargin < 2
-    sheetName = 'Sheet'; % EN: Sheet, DE: Tabelle, HE: âéìéåï , etc. (Lang. dependent)
+    sheetName = 'Sheet'; % EN: Sheet, DE: Tabelle, HE: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ , etc. (Lang. dependent)
 else
     if ~ischar(sheetName)
         error('Default sheet name must be a string.');
