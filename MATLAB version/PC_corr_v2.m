@@ -1,11 +1,11 @@
 %%%%% PC-corr algorithm associate to PCA analysis%%%%%
 
 %%% Released under MIT License
-%%% Copyright (c) 16 Dec 2017 Sara Ciucci, Yan Ge, Claudio Dur�n and Carlo Vittorio Cannistraci
+%%% Copyright (c) 16 Dec 2017 Sara Ciucci, Yan Ge, Claudio Durán and Carlo Vittorio Cannistraci
 
 % Please cite:
 % Enlightening discriminative network functional modules behind Principal Component Analysis separation in differential-omic science studies.
-% Sara Ciucci, Yan Ge, Claudio Dur�n, Alessandra Palladini, V�ctor Jim�nez Jim�nez, Luisa Mar�a Mart�nez S�nchez, 
+% Sara Ciucci, Yan Ge, Claudio Durán, Alessandra Palladini, Víctor Jiménez Jiménez, Luisa María Martínez Sánchez, 
 % Yuting Wang, Susanne Sales, Andrej Shevchenko, Steven W. Poser, Maik Herbig, Oliver Otto, Andreas Androutsellis-Theotokis, 
 % Jochen Guck, Mathias J. Gerl and Carlo Vittorio Cannistraci 
 % Scientific Reports, 2017
@@ -2163,7 +2163,7 @@ if meas_seg == 3
         else 
             fprintf('\nAre you sure? Do you want to compute for all? It will take some time (minutes). [y/n]');
         end
-        fprintf('\n[y] yes, I want to compute for all the cases\n[n] no, I don�t want to compute for all the cases\n\n')
+        fprintf('\n[y] yes, I want to compute for all the cases\n[n] no, I don\'t want to compute for all the cases\n\n')
         meas_seg_all = input('-> ','s');
         if strcmp(meas_seg_all,'y') || strcmp(meas_seg_all,'n')
             flag = 1;
@@ -2936,7 +2936,7 @@ end
 
 
 if nargin < 2
-    sheetName = 'Sheet'; % EN: Sheet, DE: Tabelle, HE: ������ , etc. (Lang. dependent)
+    sheetName = 'Sheet'; % EN: Sheet, DE: Tabelle, HE: âéìéåï , etc. (Lang. dependent)
 else
     if ~ischar(sheetName)
         error('Default sheet name must be a string.');
