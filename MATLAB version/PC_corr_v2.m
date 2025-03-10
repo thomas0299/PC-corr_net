@@ -5,8 +5,8 @@
 
 % Please cite:
 % Enlightening discriminative network functional modules behind Principal Component Analysis separation in differential-omic science studies.
-% Sara Ciucci, Yan Ge, Claudio Durán, Alessandra Palladini, Víctor Jiménez Jiménez, Luisa María Martínez Sánchez, 
-% Yuting Wang, Susanne Sales, Andrej Shevchenko, Steven W. Poser, Maik Herbig, Oliver Otto, Andreas Androutsellis-Theotokis, 
+% Sara Ciucci, Yan Ge, Claudio Durán, Alessandra Palladini, Víctor Jiménez Jiménez, Luisa María Martínez Sánchez,
+% Yuting Wang, Susanne Sales, Andrej Shevchenko, Steven W. Poser, Maik Herbig, Oliver Otto, Andreas Androutsellis-Theotokis,
 % Jochen Guck, Mathias J. Gerl and Carlo Vittorio Cannistraci 
 % Scientific Reports, 2017
 
