@@ -8,6 +8,7 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib.lines import Line2D
 from scipy.stats import gaussian_kde, mannwhitneyu, pearsonr, spearmanr
 from sklearn.decomposition import PCA
 from sklearn.metrics import auc, precision_recall_curve, roc_auc_score
@@ -916,18 +917,20 @@ def visualize_network(Edges: list[dict], Nodes: list[dict], hide_negative_links:
                 node_colors[row["Node"]] = row["Colour"]
 
         # Get node positions (force-directed layout)
-        pos = nx.spring_layout(G, seed=42)
+        pos = nx.spring_layout(G, seed=42, k=10 / G.number_of_nodes())
 
         node_list = list(G.nodes)
         color_list = [node_colors.get(node, "gray") for node in node_list]
+        node_degrees = dict(G.degree())
+        node_size_list = [500 + 50 * node_degrees[node] for node in node_list]
+
         nx.draw_networkx_nodes(
-            G, pos, node_color=color_list, node_size=500, edgecolors="black"
+            G, pos, node_color=color_list, node_size=node_size_list, edgecolors="black"
         )
 
         for node1, node2 in G.edges:
             edges_to_draw.append((node1, node2))
 
-            # **Determine color of edge**
             edge_weight = G[node1][node2]["weight"]
             edge_colors.append("black" if edge_weight >= 0 else "yellow")
 
@@ -947,9 +950,17 @@ def visualize_network(Edges: list[dict], Nodes: list[dict], hide_negative_links:
                 style=style,
             )
 
-        nx.draw_networkx_labels(G, pos, font_size=10, font_color="black")
+        nx.draw_networkx_labels(G, pos, font_size=9, font_color="black")
 
-        plt.title(f"PC-Corr Network (Cutoff = {cutoff})")
+        line1 = Line2D([0], [0], color="black", lw=2, label="Positive link")
+        line2 = Line2D(
+            [0], [0], color="black", linestyle="--", lw=2, label="Frustrated link"
+        )
+
+        plt.legend(handles=[line1, line2], fontsize=7)
+
+        plt.title(f"c. cutoff={cutoff}", fontsize=18)
+        plt.savefig("pc-corr_network.png", dpi=1000)
         plt.show()
 
 
@@ -1568,7 +1579,6 @@ def PC_corr_v2(
     axes[1].set_ylabel("Explained Variance (%)")
     axes[1].set_title("Explained Variance for the Respective Principal Components")
 
-    # Save the figure as a PNG file
     plt.tight_layout()
     plt.savefig("bar_plots.png", dpi=300)
     plt.show()
