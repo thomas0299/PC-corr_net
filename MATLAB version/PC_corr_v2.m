@@ -2163,7 +2163,7 @@ if meas_seg == 3
         else 
             fprintf('\nAre you sure? Do you want to compute for all? It will take some time (minutes). [y/n]');
         end
-        fprintf('\n[y] yes, I want to compute for all the cases\n[n] no, I don\'t want to compute for all the cases\n\n')
+        fprintf('\n[y] yes, I want to compute for all the cases\n[n] no, I dont want to compute for all the cases\n\n')
         meas_seg_all = input('-> ','s');
         if strcmp(meas_seg_all,'y') || strcmp(meas_seg_all,'n')
             flag = 1;

@@ -2112,10 +2112,10 @@ PC_corr_v2<-function(x,sample_labels,feat_names, sample_names,dis) {
     if(n<4){
       cutoff <- 0.7
     }
-    
+
     V <- sign(V) * log10(1+abs(V)/mean(abs(V)))
     V <- sign(V) * ((abs(V)-min(abs(V)))/(max(abs(V))-min(abs(V))))
-    
+
     # PC-corr on all the features
     
     x_temp <- x
@@ -2389,7 +2389,7 @@ PC_corr_v2<-function(x,sample_labels,feat_names, sample_names,dis) {
       cat("Please introduce a correct cut-off or a set of cut-offs (in [0,1]).\n")
     }
   }
-  
+
   cut_off <-c()
   if (length(cutoff) == 1){
     pc_corr_res <- C_corr(norm[[u_norm]],pc[[u_norm]][,u_dim],feat_names,cutoff)
@@ -2402,7 +2402,7 @@ PC_corr_v2<-function(x,sample_labels,feat_names, sample_names,dis) {
     n2_f <- samplCol$n2_f
     Nodes <- data.frame(pc_corr_res$Nodes[,1], samplCol$NodeColor,pc_corr_res$Nodes[,2])
     colnames(Nodes) <- c("Node","Colour","Loading (V)")
-    
+
     cut_off <- cutoff_f
     edges <- Edges
     nodes <- Nodes
@@ -3106,43 +3106,3 @@ PC_corr_v2<-function(x,sample_labels,feat_names, sample_names,dis) {
 list2env(list(Edges=Edges,Nodes=Nodes),.GlobalEnv)
 
 }
-
-  
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
