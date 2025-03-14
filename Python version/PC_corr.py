@@ -879,7 +879,7 @@ def visualize_network(Edges: list[dict], Nodes: list[dict], hide_negative_links:
     Visualizes the PC-Corr network using NetworkX.
 
     - If two nodes have different colors, their link is drawn as dashed.
-    - Positive links are black, negative links are yellow.
+    - Positive links are black, negative links are gold.
     - If hide_negative_links is "y", negative-weight edges are removed.
 
     Parameters:
@@ -922,7 +922,7 @@ def visualize_network(Edges: list[dict], Nodes: list[dict], hide_negative_links:
         node_list = list(G.nodes)
         color_list = [node_colors.get(node, "gray") for node in node_list]
         node_degrees = dict(G.degree())
-        node_size_list = [500 + 50 * node_degrees[node] for node in node_list]
+        node_size_list = [2000 + 500 * node_degrees[node] for node in node_list]
 
         nx.draw_networkx_nodes(
             G, pos, node_color=color_list, node_size=node_size_list, edgecolors="black"
@@ -932,9 +932,13 @@ def visualize_network(Edges: list[dict], Nodes: list[dict], hide_negative_links:
             edges_to_draw.append((node1, node2))
 
             edge_weight = G[node1][node2]["weight"]
-            edge_colors.append("black" if edge_weight >= 0 else "yellow")
+            color_of_edge = "black" if edge_weight >= 0 else "gold"
 
-            if node_colors.get(node1, "gray") == node_colors.get(node2, "gray"):
+            edge_colors.append(color_of_edge)
+
+            if (node_colors[node1] == node_colors[node2] and edge_weight >= 0) or (
+                node_colors[node1] != node_colors[node2] and edge_weight < 0
+            ):
                 edge_styles.append("solid")
             else:
                 edge_styles.append("dashed")
@@ -950,17 +954,22 @@ def visualize_network(Edges: list[dict], Nodes: list[dict], hide_negative_links:
                 style=style,
             )
 
-        nx.draw_networkx_labels(G, pos, font_size=9, font_color="black")
+        nx.draw_networkx_labels(
+            G, pos, font_size=9, font_color="black", font_weight="bold"
+        )
 
         line1 = Line2D([0], [0], color="black", lw=2, label="Positive link")
         line2 = Line2D(
             [0], [0], color="black", linestyle="--", lw=2, label="Frustrated link"
         )
 
-        plt.legend(handles=[line1, line2], fontsize=7)
+        plt.legend(handles=[line1, line2], fontsize=16)
 
-        plt.title(f"c. cutoff={cutoff}", fontsize=18)
-        plt.savefig("pc-corr_network.png", dpi=1000)
+        plt.title(f"a. cutoff={cutoff}", fontsize=28)
+        plt.tight_layout(rect=[0, 0, 1, 1])
+        plt.savefig(
+            "pc-corr_network.png", dpi=1000, bbox_inches="tight", pad_inches=0.1
+        )
         plt.show()
 
 
